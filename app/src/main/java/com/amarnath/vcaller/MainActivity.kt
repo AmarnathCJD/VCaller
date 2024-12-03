@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -120,7 +121,8 @@ fun CallStatusView(callState: MutableState<CallState>) {
     CallStatusViewBox(callState)
 }
 
-var apiKey = "xxxxxxxxx-23dd-4b0d-8f9b-xxxxxxxxxxxx"
+var apiKey = "xxxxxxxxx-23dd-4b0d-8f9b-xxxxxxxxx"
+var loggedInNumber = "+91 1234567890"
 var overlayStatus = mutableStateOf(false)
 
 data class PermissionStatus(
@@ -129,6 +131,13 @@ data class PermissionStatus(
     val phoneState: Boolean = false,
     val callLog: Boolean = false
 )
+
+val permissions = mutableStateOf(PermissionStatus(
+    overlay = true,
+    notification = true,
+    phoneState = true,
+    callLog = true
+))
 
 @Composable
 fun CallStatusViewBox(callState: MutableState<CallState>) {
@@ -147,22 +156,18 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                     .padding(top = 24.dp)
                     .background(
                         primaryColor,
+                        shape = RoundedCornerShape(bottomEnd = 32.dp, bottomStart = 32.dp)
                     )
+                    .border(width = Dp.Hairline, Color.White, shape = RoundedCornerShape(bottomEnd = 32.dp, bottomStart = 32.dp))
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = "Phone Icon",
-                    tint = backgroundColor,
-                    modifier = Modifier.size(28.dp)
-                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "vCaller: Enhanced Privacy",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.White
                 )
             }
@@ -184,6 +189,7 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                 .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            LottieLoading(id = R.raw.icon, size = 80)
             Spacer(modifier = Modifier.height(20.dp))
             Card(
                 modifier = Modifier
@@ -227,6 +233,20 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
+
+                    Row (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        Text(
+                            text = "Logged in as: $loggedInNumber",
+                            fontSize = 14.sp,
+                            color = textColor.copy(alpha = 0.7f),
+                            fontWeight = FontWeight.Bold,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
@@ -241,7 +261,8 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                                 ),
                                 contentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text(
                                 text = if (overlayStatus.value) "Disable Overlay" else "Enable Overlay",
@@ -249,6 +270,8 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                                 fontWeight = FontWeight.Bold,
                             )
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Button(
                             onClick = {
@@ -259,6 +282,7 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                                 contentColor = Color.White
                             ),
                             shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Settings,

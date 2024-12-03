@@ -15,8 +15,24 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 class CallStatusService : Service() {
     private val callState = MutableLiveData<CallState>()
@@ -119,4 +135,36 @@ class CallStatusService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+}
+
+
+@Composable
+fun LottieLoading(id: Int, size: Int = 200) {
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec
+            .RawRes(id)
+    )
+
+    val progress by animateLottieCompositionAsState(
+        composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
+
+        speed = 1f,
+        restartOnPlay = true
+    )
+
+    Column(
+        Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LottieAnimation(
+            composition,
+            progress,
+            modifier = Modifier.size(size.dp)
+        )
+    }
 }

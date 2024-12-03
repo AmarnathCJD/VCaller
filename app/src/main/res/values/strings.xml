@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">vCaller</string>
+    <string name="caller_name">fetching …</string>
+    <string name="caller_num">(UNKNOWN NUMBER)</string>
+    <string name="incoming_call_icon">Incoming Call Icon</string>
+</resources>

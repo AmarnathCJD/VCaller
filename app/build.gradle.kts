@@ -59,4 +59,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.lottie.compose)
+    implementation(libs.okhttp)
+    implementation(libs.gson)
 }

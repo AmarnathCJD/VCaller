@@ -26,32 +26,42 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -59,6 +69,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createNotificationChannel()
+
         if (!Settings.canDrawOverlays(this)) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -132,12 +143,14 @@ data class PermissionStatus(
     val callLog: Boolean = false
 )
 
-val permissions = mutableStateOf(PermissionStatus(
-    overlay = true,
-    notification = true,
-    phoneState = true,
-    callLog = true
-))
+val permissions = mutableStateOf(
+    PermissionStatus(
+        overlay = true,
+        notification = true,
+        phoneState = true,
+        callLog = true
+    )
+)
 
 @Composable
 fun CallStatusViewBox(callState: MutableState<CallState>) {
@@ -152,13 +165,10 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                    .padding(top = 24.dp)
                     .background(
                         primaryColor,
-                        shape = RoundedCornerShape(bottomEnd = 32.dp, bottomStart = 32.dp)
+                        shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
                     )
-                    .border(width = Dp.Hairline, Color.White, shape = RoundedCornerShape(bottomEnd = 32.dp, bottomStart = 32.dp))
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -184,12 +194,52 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                         )
                     )
                 )
+                .verticalScroll(rememberScrollState())
                 .padding(top = it.calculateTopPadding() - 40.dp)
                 .padding(20.dp)
                 .padding(top = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            LottieLoading(id = R.raw.icon, size = 80)
+            Spacer(modifier = Modifier.height(20.dp))
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFF242424)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .padding(top = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    NumberSearchView()
+                    Spacer(modifier = Modifier.height(20.dp))
+                    LottieLoading(id = R.raw.icon, size = 80)
+                    Text(
+                        text = "Powered by Truecaller SDK",
+                        fontSize = 14.sp,
+                        color = textColor.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = "No upstream data collection, No Ads, No Tracking",
+                        fontSize = 12.sp,
+                        color = Color(0xFFFF6D00).copy(alpha = 0.7f),
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Left
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
             Card(
                 modifier = Modifier
@@ -206,6 +256,7 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
+
                     InfoRow(
                         icon = Icons.Filled.Info,
                         label = "State",
@@ -234,10 +285,10 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    Row (
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
-                    ){
+                    ) {
                         Text(
                             text = "Logged in as: $loggedInNumber",
                             fontSize = 14.sp,
@@ -302,7 +353,6 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
             Card(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -320,22 +370,11 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Powered by Truecaller SDK",
-                        fontSize = 14.sp,
-                        color = textColor.copy(alpha = 0.7f),
-                        fontWeight = FontWeight.Bold,
+                        text = "API Key",
+                        fontSize = 16.sp,
+                        color = textColor,
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = "No upstream data collection, No Ads, No Tracking",
-                        fontSize = 12.sp,
-                        color = Color(0xFFFF6D00).copy(alpha = 0.7f),
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 16.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Left
-                    )
-
                     Box(
                         modifier = Modifier
                             .background(Color(0xFF242424))
@@ -448,6 +487,142 @@ fun CallStatusViewBox(callState: MutableState<CallState>) {
 }
 
 @Composable
+fun NumberSearchView() {
+    var truecData by remember { mutableStateOf<Truecaller?>(null) }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Top
+    ) {
+        var number by remember { mutableStateOf("") }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = number,
+                onValueChange = { number = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF242424),
+                    unfocusedContainerColor = Color(0xFF242424),
+                    focusedLabelColor = Color(0xFF3797EF),
+                    unfocusedLabelColor = Color(0xFF3797EF),
+                    cursorColor = Color(0xFF3797EF),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedPlaceholderColor = Color(0xFF3797EF),
+                    focusedBorderColor = Color(0xFF3797EF),
+                    unfocusedBorderColor = Color(0xFF3797EF),
+                ),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            Thread {
+                                truecData = getTruecallerDetails(number)
+                            }.start()
+                        },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = Color(0xFF3797EF)
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search Icon",
+                            tint = Color(0xFF3797EF)
+                        )
+                    }
+                },
+                shape = RoundedCornerShape(8.dp),
+            )
+        }
+
+        if (truecData != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
+                Row (
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Text(
+                        text = "Truecaller Data",
+                        fontSize = 16.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(
+                        onClick = {
+                            truecData = null
+                        },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            contentColor = Color(0xFF3797EF)
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Clear Icon",
+                            tint = Color(0xFFD50000)
+                        )
+                    }
+                }
+
+                truecData?.data?.forEach { data ->
+                    InfoRow(
+                        icon = Icons.Filled.Person,
+                        label = "Name",
+                        value = data.name,
+                        primaryColor = Color(0xFF3797EF),
+                        textColor = Color.White
+                    )
+
+                    data.phones.forEach { phone ->
+                        InfoRow(
+                            icon = Icons.Filled.Call,
+                            label = "Phone",
+                            value = phone.e164Format,
+                            primaryColor = Color(0xFF3797EF),
+                            textColor = Color.White
+                        )
+                    }
+
+                    data.addresses.forEach { address ->
+                        InfoRow(
+                            icon = Icons.Filled.Info,
+                            label = "Address",
+                            value = parseAddress(address),
+                            primaryColor = Color(0xFF3797EF),
+                            textColor = Color.White
+                        )
+                    }
+
+                    if (data.internetAddresses.isNotEmpty()) {
+                        data.internetAddresses.forEach { internetAddress ->
+                            InfoRow(
+                                icon = Icons.Filled.MailOutline,
+                                label = "Internet Address",
+                                value = parseInternetAddress(internetAddress),
+                                primaryColor = Color(0xFF3797EF),
+                                textColor = Color.White
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun InfoRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     label: String,
@@ -492,6 +667,9 @@ fun getCallStateFromIntent(intent: Intent): CallState {
         TelephonyManager.EXTRA_STATE_RINGING -> "RINGING"
         else -> "UNKNOWN"
     }
+
+
+//    CallScreeningService
 
     if (state == "RINGING") {
         val phoneNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
